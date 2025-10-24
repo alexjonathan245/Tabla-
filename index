@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torno de Campeones - 7 Equipos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+        :root {
+            --primary-color: #0a192f;
+            --secondary-color: #172a45;
+            --accent-color: #64ffda;
+            --text-color: #ccd6f6;
+            --light-text: #8892b0;
+            --white: #ffffff;
+            --gold: #ffd700;
+            --success: #4caf50;
+            --danger: #f44336;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 0;
+            background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--white);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            color: var(--accent-color);
+            margin-top: 10px;
+        }
+
+        main {
+            padding: 40px 0;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--white);
+            border-left: 5px solid var(--accent-color);
+            padding-left: 15px;
+        }
+
+        .info-box {
+            background-color: var(--secondary-color);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            border: 1px solid #2a3f5f;
+        }
+
+        .info-box h3 {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+        }
+
+        .info-box ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .info-box li {
+            padding: 5px 0;
+        }
+
+        .info-box li i {
+            color: var(--accent-color);
+            margin-right: 10px;
+        }
+
+        /* Team Selection */
+        .team-selection-container {
+            margin-top: 20px;
+        }
+        .team-selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .team-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background-color: var(--primary-color);
+            border-radius: 5px;
+            border: 1px solid #2a3f5f;
+            transition: all 0.3s ease;
+        }
+        .team-item:hover {
+            border-color: var(--accent-color);
+        }
+        .team-item input[type="checkbox"] {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .team-item label {
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+        }
+        .team-item.disabled {
+            opacity: 0.4;
+        }
+        .btn-generate {
+            padding: 12px 30px;
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: block;
+            margin: 20px auto 0;
+        }
+        .btn-generate:hover {
+            background-color: #4dd0b8;
+            transform: scale(1.05);
+        }
+
+        /* Tabla de Posiciones */
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--secondary-color);
+            border-radius: 8px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #2a3f5f;
+        }
+
+        th {
+            background-color: #1a2f4a;
+            font-weight: 600;
+            color: var(--white);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr {
+            transition: background-color 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background-color: #1e3a5f;
+        }
+
+        .team-name {
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .winner {
+            background-color: rgba(255, 215, 0, 0.1) !important; /* Fondo dorado sutil */
+            font-weight: 700;
+            color: var(--gold);
+        }
+        .winner .team-name::after {
+            content: ' \f091'; /* Icono de trofeo */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            margin-left: 10px;
+        }
+
+        /* Lista de Partidos */
+        .match-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .match-card {
+            background-color: var(--secondary-color);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #2a3f5f;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .match-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        }
+
+        .match-card.played {
+            opacity: 0.6;
+            background-color: #1a2f4a;
+        }
+
+        .team {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .vs {
+            color: var(--light-text);
+            font-weight: 400;
+            margin: 0 15px;
+        }
+
+        .score-inputs {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .score-inputs input {
+            width: 50px;
+            padding: 8px;
+            text-align: center;
+            border: 1px solid var(--accent-color);
+            background-color: var(--primary-color);
+            color: var(--white);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .btn-submit {
+            padding: 8px 15px;
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            background-color: #4dd0b8;
+        }
+
+        .btn-submit:disabled {
+            background-color: var(--light-text);
+            cursor: not-allowed;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            border-top: 1px solid var(--secondary-color);
+            color: var(--light-text);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+            .match-card {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .score-inputs {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-trophy"></i> Torneo de Campeones</h1>
+            <p>Liguilla Personalizable - Selecciona a los Participantes</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="info-box">
+            <h3><i class="fas fa-cog"></i> Configuración del Torneo</h3>
+            <p>Selecciona los equipos que participarán en la liguilla y luego haz clic en "Generar Torneo".</p>
+            <ul>
+                <li><i class="fas fa-check-circle"></i> <strong>Partidos por equipo:</strong> Será (N - 1), donde N es el número de equipos seleccionados.</li>
+                <li><i class="fas fa-check-circle"></i> <strong>Total de partidos:</strong> Se calculará automáticamente.</li>
+                <li><i class="fas fa-check-circle"></i> <strong>Puntuación:</strong> Ganado (3 pts) | Empatado (1 pt) | Perdido (0 pts).</li>
+            </ul>
+            
+            <div class="team-selection-container">
+                <h4>Selecciona los Equipos:</h4>
+                <div id="team-selection-grid" class="team-selection-grid">
+                    <!-- Las opciones de equipo se generarán con JavaScript -->
+                </div>
+                <button id="btn-generate-tournament" class="btn-generate">
+                    <i class="fas fa-play"></i> Generar Torneo
+                </button>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title"><i class="fas fa-list-ol"></i> Tabla de Posiciones</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Pos</th>
+                            <th>Equipo</th>
+                            <th>PJ</th>
+                            <th>PG</th>
+                            <th>PE</th>
+                            <th>PP</th>
+                            <th>GF</th>
+                            <th>GC</th>
+                            <th>DG</th>
+                            <th>Pts</th>
+                        </tr>
+                    </thead>
+                    <tbody id="standings-table">
+                        <tr>
+                            <td colspan="10" style="text-align: center; padding: 40px; color: var(--light-text);">
+                                Selecciona los equipos y haz clic en "Generar Torneo" para comenzar.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title"><i class="fas fa-calendar-alt"></i> Lista de Partidos</h2>
+            <div id="match-list" class="match-list">
+                 <p style="text-align: center; width: 100%; color: var(--light-text);">La lista de partidos aparecerá aquí.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 - Torneo de Campeones | Desarrollado con HTML, CSS y JavaScript</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DATOS INICIALES ---
+            const teamsData = [
+                { name: 'CARLOS', isActive: true },
+                { name: 'JONATHAN', isActive: true },
+                { name: 'ANGELINO', isActive: true },
+                { name: 'LEO', isActive: true },
+                { name: 'ANDRES', isActive: true },
+                { name: 'JUNIOR', isActive: true },
+                { name: 'JORDAN', isActive: true }
+            ];
+            
+            // Usamos un array que contendrá los objetos completos del equipo
+            let teams = [];
+
+            // --- ELEMENTOS DEL DOM ---
+            const teamSelectionGrid = document.getElementById('team-selection-grid');
+            const standingsTable = document.getElementById('standings-table');
+            const matchListContainer = document.getElementById('match-list');
+            const btnGenerate = document.getElementById('btn-generate-tournament');
+
+            // --- FUNCIONES DE LA INTERFAZ ---
+            
+            function renderTeamSelection() {
+                teamSelectionGrid.innerHTML = '';
+                teamsData.forEach((team, index) => {
+                    const teamItem = document.createElement('div');
+                    teamItem.className = 'team-item';
+                    teamItem.innerHTML = `
+                        <input type="checkbox" id="team-${index}" data-index="${index}" ${team.isActive ? 'checked' : ''}>
+                        <label for="team-${index}">${team.name}</label>
+                    `;
+                    teamSelectionGrid.appendChild(teamItem);
+                });
+            }
+
+            function handleTeamToggle(event) {
+                const checkbox = event.target;
+                const index = parseInt(checkbox.dataset.index);
+                teamsData[index].isActive = checkbox.checked;
+                
+                const teamItem = checkbox.parentElement;
+                if (teamsData[index].isActive) {
+                    teamItem.classList.remove('disabled');
+                } else {
+                    teamItem.classList.add('disabled');
+                }
+            }
+
+            function generateTournament() {
+                const activeTeamsData = teamsData.filter(team => team.isActive);
+
+                if (activeTeamsData.length < 2) {
+                    alert('Debes seleccionar al menos 2 equipos para generar un torneo.');
+                    return;
+                }
+
+                // 1. Resetear y preparar el array de equipos para el torneo
+                teams = activeTeamsData.map(data => ({
+                    ...data,
+                    played: 0, won: 0, drawn: 0, lost: 0,
+                    goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0
+                }));
+                
+                // 2. Renderizar la tabla y los partidos
+                renderStandings();
+                renderMatchList();
+            }
+
+            function renderStandings() {
+                if (teams.length === 0) return;
+
+                // Ordenar equipos: 1. Puntos, 2. Diferencia de Gol, 3. Goles a Favor
+                teams.sort((a, b) => {
+                    if (b.points !== a.points) return b.points - a.points;
+                    if (b.goalDifference !== a.goalDifference) return b.goalDifference - a.goalDifference;
+                    return b.goalsFor - a.goalsFor;
+                });
+
+                standingsTable.innerHTML = '';
+                const isTournamentOver = teams.every(t => t.played === teams.length - 1);
+
+                teams.forEach((team, index) => {
+                    const row = document.createElement('tr');
+                    if (index === 0 && isTournamentOver) {
+                        row.classList.add('winner');
+                    }
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td class="team-name">${team.name}</td>
+                        <td>${team.played}</td>
+                        <td>${team.won}</td>
+                        <td>${team.drawn}</td>
+                        <td>${team.lost}</td>
+                        <td>${team.goalsFor}</td>
+                        <td>${team.goalsAgainst}</td>
+                        <td>${team.goalDifference}</td>
+                        <td><strong>${team.points}</strong></td>
+                    `;
+                    standingsTable.appendChild(row);
+                });
+            }
+
+            function renderMatchList() {
+                if (teams.length === 0) return;
+                
+                matchListContainer.innerHTML = '';
+                const matches = [];
+                for (let i = 0; i < teams.length; i++) {
+                    for (let j = i + 1; j < teams.length; j++) {
+                        matches.push({ home: teams[i], away: teams[j] });
+                    }
+                }
+
+                matches.forEach((match, index) => {
+                    const matchCard = document.createElement('div');
+                    matchCard.className = 'match-card';
+                    matchCard.id = `match-${index}`;
+                    
+                    matchCard.innerHTML = `
+                        <span class="team">${match.home.name}</span>
+                        <div class="score-inputs">
+                            <input type="number" id="home-score-${index}" min="0" placeholder="0">
+                            <span class="vs">VS</span>
+                            <input type="number" id="away-score-${index}" min="0" placeholder="0">
+                            <button class="btn-submit" data-match-index="${index}" data-home-name="${match.home.name}" data-away-name="${match.away.name}">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </div>
+                        <span class="team">${match.away.name}</span>
+                    `;
+                    matchListContainer.appendChild(matchCard);
+                });
+            }
+
+            function submitResult(event) {
+                const button = event.target.closest('button');
+                if (button.disabled) return;
+
+                const matchIndex = parseInt(button.dataset.matchIndex);
+                const homeTeamName = button.dataset.homeName;
+                const awayTeamName = button.dataset.awayName;
+
+                const homeScoreInput = document.getElementById(`home-score-${matchIndex}`);
+                const awayScoreInput = document.getElementById(`away-score-${matchIndex}`);
+                const homeScore = parseInt(homeScoreInput.value) || 0;
+                const awayScore = parseInt(awayScoreInput.value) || 0;
+
+                const homeTeam = teams.find(t => t.name === homeTeamName);
+                const awayTeam = teams.find(t => t.name === awayTeamName);
+
+                if (!homeTeam || !awayTeam) return;
+
+                // Actualizar estadísticas
+                homeTeam.played++;
+                awayTeam.played++;
+                homeTeam.goalsFor += homeScore;
+                homeTeam.goalsAgainst += awayScore;
+                awayTeam.goalsFor += awayScore;
+                awayTeam.goalsAgainst += homeScore;
+
+                if (homeScore > awayScore) {
+                    homeTeam.won++;
+                    homeTeam.points += 3;
+                    awayTeam.lost++;
+                } else if (awayScore > homeScore) {
+                    awayTeam.won++;
+                    awayTeam.points += 3;
+                    homeTeam.lost++;
+                } else {
+                    homeTeam.drawn++;
+                    awayTeam.drawn++;
+                    homeTeam.points += 1;
+                    awayTeam.points += 1;
+                }
+
+                // Actualizar diferencias de gol
+                homeTeam.goalDifference = homeTeam.goalsFor - homeTeam.goalsAgainst;
+                awayTeam.goalDifference = awayTeam.goalsFor - awayTeam.goalsAgainst;
+
+                // Desactivar el partido
+                const matchCard = document.getElementById(`match-${matchIndex}`);
+                matchCard.classList.add('played');
+                homeScoreInput.disabled = true;
+                awayScoreInput.disabled = true;
+                button.disabled = true;
+
+                // Re-renderizar la tabla
+                renderStandings();
+            }
+
+            // --- EVENT LISTENERS ---
+            btnGenerate.addEventListener('click', generateTournament);
+            teamSelectionGrid.addEventListener('change', handleTeamToggle);
+            matchListContainer.addEventListener('click', submitResult);
+
+            // --- INICIALIZACIÓN ---
+            renderTeamSelection();
+        });
+    </script>
+</body>
+</html>
